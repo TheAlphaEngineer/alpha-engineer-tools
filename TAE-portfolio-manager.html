@@ -91,13 +91,13 @@
             min-width: 150px;
         }
         
-        .portfolio-table {
+        .portfolio-table, .available-stocks-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
         
-        .portfolio-table th {
+        .portfolio-table th, .available-stocks-table th {
             background-color: #34495e;
             color: white;
             padding: 10px;
@@ -108,13 +108,17 @@
             z-index: 10;
         }
         
-        .portfolio-table td {
+        .available-stocks-table th {
+            background-color: #27ae60;
+        }
+        
+        .portfolio-table td, .available-stocks-table td {
             padding: 8px;
             border-bottom: 1px solid #ddd;
             font-size: 12px;
         }
         
-        .portfolio-table tr:hover {
+        .portfolio-table tr:hover, .available-stocks-table tr:hover {
             background-color: #f5f5f5;
         }
         
@@ -149,7 +153,7 @@
             font-style: italic;
         }
         
-<!--         .button {
+        .button {
             background-color: #3498db;
             color: white;
             padding: 10px 20px;
@@ -163,7 +167,7 @@
         
         .button:hover {
             background-color: #2980b9;
-        } -->
+        }
         
         .export-button {
             background-color: #27ae60;
@@ -179,6 +183,22 @@
         
         .import-button:hover {
             background-color: #7d3c98;
+        }
+        
+        .random-button {
+            background-color: #f39c12;
+        }
+        
+        .random-button:hover {
+            background-color: #e67e22;
+        }
+        
+        .clear-button {
+            background-color: #95a5a6;
+        }
+        
+        .clear-button:hover {
+            background-color: #7f8c8d;
         }
         
         .instructions {
@@ -238,23 +258,73 @@
             position: sticky;
             bottom: 0;
         }
+        
+        .selected-stock {
+            background-color: #fff3cd !important;
+            font-weight: bold;
+        }
+        
+        .rank-99 {
+            background-color: #e8f5e9;
+        }
+        
+        .rank-98 {
+            background-color: #f3e5f5;
+        }
+        
+        .rank-97 {
+            background-color: #e3f2fd;
+        }
+        
+        .rank-96 {
+            background-color: #fff3e0;
+        }
+        
+        .rank-95 {
+            background-color: #fce4ec;
+        }
+        
+        .available-stocks-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 3px solid #3498db;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>The Alpha Engineer Portfolio Manager</h1>
+        <div style="margin-top: -20px; margin-bottom: 20px; padding: 10px; background-color: #e8f4f8; border-radius: 5px; border-left: 4px solid #3498db;">
+            <div style="margin-bottom: 5px;">
+                <strong>Version 1.1</strong> | Released October 4, 2025 | 
+                <a href="https://www.thealphaengineer.com/p/portfolio-manager-tool-v1_1" target="_blank" style="color: #3498db; text-decoration: none; font-weight: bold;">
+                    ✨ What's New in v1.1
+                </a>
+            </div>
+            <div style="font-size: 0.9em; color: #666;">
+                Version 1.0 | Released August 22, 2025 | 
+                <a href="https://www.thealphaengineer.com/p/portfolio-manager-tool" target="_blank" style="color: #3498db; text-decoration: none;">
+                    v1.0 Explained
+                </a>
+            </div>
+        </div>
         
         <div class="instructions">
             <h3>📋 How to Use This Tool</h3>
+            <p><em>Core functionality remains unchanged from v1.0. New v1.1 features are optional enhancements (bold).</em></p>
             <ul>
                 <li>Upload the latest Alpha Engineer stock ranking spreadsheet (Excel format)</li>
                 <li>First time use: set your minimum rank threshold for SELL signals</li>
                 <li>First time use: enter your current stock tickers in the portfolio table</li>
                 <li>The tool will automatically show SELL signals for stocks below your minimum rank</li>
-				<li>Sell the stocks and buy new top stocks from the Alpha Engineer stock ranking</li>
-                <li>Optional: use the position sizing guide to determine minimum and maximum buy size of a stock</li>
-				<li>Replace the sold stocks with the newly bought stocks</li>
-                <li>Export your portfolio to save it and import it next time to repeat the process</li>
+                <li>Review the Ranking spreadsheet or the <strong>"Available Top Stocks" section below for potential replacements</strong></li>
+                <li><strong>Optional: Click "Remove" on any stocks you can't or don't want to buy</strong></li>
+                <li><strong>Optional: Manually select stocks by clicking "Select" buttons OR use "Random Selection" for automatic picks</strong></li>
+                <li>Execute your trades: sell the stocks marked SELL and buy your chosen replacements</li>
+                <li>Optional: use the position sizing guide to determine minimum and maximum buy size</li>
+                <li><strong>Important:</strong> Manually update your portfolio holdings by replacing sold tickers with bought tickers</li>
+                <li>Export your portfolio to save it <strong>(including audit trail)</strong></li>
+                <li>Import your portfolio next time to repeat the process</li>
             </ul>
         </div>
         
@@ -309,11 +379,10 @@
         
         <h2>Portfolio Holdings</h2>
         <div style="margin-bottom: 10px;">
-<!--             <button class="button" onclick="refreshData()">🔄 Refresh Data</button> -->
             <button class="button import-button" onclick="document.getElementById('importFile').click()">📂 Import Portfolio</button>
             <button class="button export-button" onclick="exportToExcel()">💾 Export Portfolio</button>
             <input type="file" id="importFile" accept=".xlsx" style="display: none;" onchange="importFromExcel(event)" />
-            <button class="button" onclick="clearAllTickers()">🗑️ Clear All</button>
+            <button class="button clear-button" onclick="clearAllTickers()">🗑️ Clear All</button>
         </div>
         
         <div class="table-container">
@@ -344,11 +413,52 @@
             <span id="sellCount" style="color: #e74c3c;">0</span> SELL signals |
             <span id="holdCount" style="color: #27ae60;">0</span> HOLD signals
         </div>
+        
+        <!-- New Section: Available Top Stocks -->
+        <div class="available-stocks-section">
+            <h2>Available Top Stocks</h2>
+            <div style="margin-bottom: 10px;">
+                <button class="button random-button" onclick="randomSelection()">🎲 Random Selection</button>
+                <button class="button" onclick="clearSelection()">✖ Clear Selection</button>
+                <button class="button" style="background-color: #95a5a6;" onclick="clearAllRemovedStocks()">↺ Restore All Removed</button>
+                <span style="margin-left: 20px; font-size: 14px;">
+                    <strong>Available:</strong> 
+                    <span id="availableCount">0</span> stocks | 
+                    <span id="selectedCount" style="color: #f39c12;">0</span> selected |
+                    <span id="removedCount" style="color: #e74c3c;">0</span> removed
+                </span>
+            </div>
+            
+            <div class="table-container" style="max-height: 400px;">
+                <table class="available-stocks-table" id="availableStocksTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Ticker</th>
+                            <th>Name</th>
+                            <th>Sector</th>
+                            <th>Country</th>
+                            <th>Mkt Cap</th>
+                            <th>Current Rank</th>
+                            <th>Previous Rank</th>
+                            <th>Selection</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="availableStocksBody">
+                        <!-- Dynamic content will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     
     <script>
         let stockData = {};
         let portfolioTickers = new Array(100).fill('');
+        let availableStocks = [];
+        let selectedStocks = new Set();
+        let removedStocks = new Set(); // Track removed stock tickers
         
         // Initialize the portfolio table with 100 rows
         function initializePortfolio() {
@@ -384,8 +494,8 @@
             const minBuy = Math.round(avgPosition * 0.5);
             const maxBuy = Math.round(avgPosition * 1.5);
             
-            document.getElementById('minBuySize').textContent = minBuy; // minBuy.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-            document.getElementById('maxBuySize').textContent = maxBuy; //maxBuy.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            document.getElementById('minBuySize').textContent = minBuy;
+            document.getElementById('maxBuySize').textContent = maxBuy;
         }
         
         // Format market cap
@@ -414,13 +524,13 @@
                     
                     // Build stock data lookup
                     stockData = {};
-					stockCount ={};
+                    stockCount = {};
                     jsonData.forEach(row => {
                         if (row.Ticker) {
                             // Handle different ticker formats
                             const ticker = row.Ticker.toString().toUpperCase();
                             stockData[ticker] = row;
-							stockCount[ticker] = row;
+                            stockCount[ticker] = row;
                             
                             // Also store without exchange suffix for easier lookup
                             const simpleTicker = ticker.split(':')[0];
@@ -431,7 +541,10 @@
                     });
                     
                     showStatus('Stock data loaded successfully! ' + Object.keys(stockCount).length + ' stocks available.', 'success');
+                    removedStocks.clear(); // Clear removed stocks when loading new data
+                    selectedStocks.clear(); // Clear selections when loading new data
                     refreshData();
+                    updateAvailableStocks();
                 } catch (error) {
                     showStatus('Error loading file: ' + error.message, 'error');
                 }
@@ -450,6 +563,10 @@
             if (!ticker) {
                 clearRow(rowNum);
                 updateSummary();
+                // Update available stocks only if not part of a bulk refresh
+                if (!window.isRefreshing) {
+                    updateAvailableStocks();
+                }
                 return;
             }
             
@@ -483,12 +600,292 @@
                 document.getElementById(`prevrank-${rowNum}`).textContent = '-';
                 document.getElementById(`liquid-${rowNum}`).textContent = '-';
                 document.getElementById(`action-${rowNum}`).textContent = '-';
-				
-				const actionCell = document.getElementById(`action-${rowNum}`);
-				actionCell.innerHTML = '<div class="sell-signal">SELL</div>';
+                
+                const actionCell = document.getElementById(`action-${rowNum}`);
+                actionCell.innerHTML = '<div class="sell-signal">SELL</div>';
             }
             
             updateSummary();
+            // Update available stocks only if not part of a bulk refresh
+            if (!window.isRefreshing) {
+                updateAvailableStocks();
+            }
+        }
+        
+        // Update available stocks list
+        function updateAvailableStocks() {
+            // Save currently selected tickers before rebuilding the array
+            const selectedTickers = new Set();
+            selectedStocks.forEach(index => {
+                if (availableStocks[index]) {
+                    selectedTickers.add(availableStocks[index].ticker);
+                }
+            });
+            
+            availableStocks = [];
+            
+            // Get portfolio tickers for exclusion - get them directly from the inputs
+            const portfolioTickerSet = new Set();
+            for (let i = 1; i <= 100; i++) {
+                const tickerInput = document.getElementById(`ticker-${i}`);
+                if (tickerInput && tickerInput.value) {
+                    const ticker = tickerInput.value.toUpperCase().trim();
+                    if (ticker) {
+                        portfolioTickerSet.add(ticker);
+                        // Also add the simplified version (without exchange)
+                        const simpleTicker = ticker.split(':')[0];
+                        portfolioTickerSet.add(simpleTicker);
+                        
+                        // Remove from selected if now in portfolio
+                        selectedTickers.delete(ticker);
+                        selectedTickers.delete(simpleTicker);
+                    }
+                }
+            }
+            
+            // Filter stocks with rank 95-99, liquid = yes, not in portfolio
+            Object.entries(stockData).forEach(([ticker, stock]) => {
+                const currentRank = parseInt(stock['Current Rank']);
+                const isLiquid = stock.Liquid && stock.Liquid.toString().toLowerCase() === 'yes';
+                
+                // Check both the full ticker and simplified ticker
+                const simpleTicker = ticker.split(':')[0];
+                const isInPortfolio = portfolioTickerSet.has(ticker) || portfolioTickerSet.has(simpleTicker);
+                
+                // Only include the main ticker (not the simplified version)
+                if ((currentRank >= 95 && currentRank <= 99) && 
+                    isLiquid && 
+                    !isInPortfolio &&
+                    ticker === stock.Ticker) { // Ensure we only use the original ticker
+                    availableStocks.push({
+                        ticker: ticker,
+                        ...stock
+                    });
+                }
+            });
+            
+            // Sort by rank (descending) then alphabetically by ticker
+            availableStocks.sort((a, b) => {
+                const rankDiff = parseInt(b['Current Rank']) - parseInt(a['Current Rank']);
+                if (rankDiff !== 0) return rankDiff;
+                return a.ticker.localeCompare(b.ticker);
+            });
+            
+            // Rebuild selectedStocks with new indices
+            selectedStocks.clear();
+            availableStocks.forEach((stock, index) => {
+                if (selectedTickers.has(stock.ticker)) {
+                    selectedStocks.add(index);
+                }
+            });
+            
+            // Display available stocks
+            displayAvailableStocks();
+            updateAvailableSummary();
+        }
+        
+        // Display available stocks in the table
+        function displayAvailableStocks() {
+            const tbody = document.getElementById('availableStocksBody');
+            tbody.innerHTML = '';
+            
+            availableStocks.forEach((stock, index) => {
+                const row = tbody.insertRow();
+                const rank = parseInt(stock['Current Rank']);
+                const isRemoved = removedStocks.has(stock.ticker);
+                const isSelected = selectedStocks.has(index);
+                
+                let rankClass = '';
+                if (rank === 99) rankClass = 'rank-99';
+                else if (rank === 98) rankClass = 'rank-98';
+                else if (rank === 97) rankClass = 'rank-97';
+                else if (rank === 96) rankClass = 'rank-96';
+                else if (rank === 95) rankClass = 'rank-95';
+                
+                row.className = rankClass;
+                if (isSelected && !isRemoved) {
+                    row.classList.add('selected-stock');
+                }
+                row.id = `available-row-${index}`;
+                
+                if (isRemoved) {
+                    row.style.opacity = '0.4';
+                    row.style.textDecoration = 'line-through';
+                }
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${stock.ticker}</td>
+                    <td>${stock.Name || '-'}</td>
+                    <td>${stock.Sector || '-'}</td>
+                    <td>${stock['Country ISO Code'] || '-'}</td>
+                    <td>${formatMarketCap(stock['Mkt Cap (USD)'])}</td>
+                    <td>${stock['Current Rank'] || '-'}</td>
+                    <td>${stock['Previous Rank'] || '-'}</td>
+                    <td>
+                        ${isRemoved 
+                            ? '<span style="color: #999;">-</span>'
+                            : isSelected
+                                ? `<button class="button" style="background-color: #f39c12; padding: 5px 10px; font-size: 11px;" onclick="toggleSelection(${index})">✓ Selected</button>`
+                                : `<button class="button" style="background-color: #95a5a6; padding: 5px 10px; font-size: 11px;" onclick="toggleSelection(${index})">Select</button>`
+                        }
+                    </td>
+                    <td>
+                        ${isRemoved 
+                            ? `<button class="button" style="background-color: #27ae60; padding: 5px 10px; font-size: 11px;" onclick="restoreStock('${stock.ticker}')">✓ Restore</button>`
+                            : `<button class="button" style="background-color: #e74c3c; padding: 5px 10px; font-size: 11px;" onclick="removeStock('${stock.ticker}')">✖ Remove</button>`
+                        }
+                    </td>
+                `;
+            });
+        }
+        
+        // Toggle selection of a stock (manual selection)
+        function toggleSelection(index) {
+            const stock = availableStocks[index];
+            if (!stock || removedStocks.has(stock.ticker)) return;
+            
+            if (selectedStocks.has(index)) {
+                selectedStocks.delete(index);
+            } else {
+                selectedStocks.add(index);
+            }
+            
+            // Update display for this specific row
+            const row = document.getElementById(`available-row-${index}`);
+            if (row) {
+                if (selectedStocks.has(index)) {
+                    row.classList.add('selected-stock');
+                    row.cells[8].innerHTML = `<button class="button" style="background-color: #f39c12; padding: 5px 10px; font-size: 11px;" onclick="toggleSelection(${index})">✓ Selected</button>`;
+                } else {
+                    row.classList.remove('selected-stock');
+                    row.cells[8].innerHTML = `<button class="button" style="background-color: #95a5a6; padding: 5px 10px; font-size: 11px;" onclick="toggleSelection(${index})">Select</button>`;
+                }
+            }
+            
+            updateAvailableSummary();
+        }
+        
+        // Remove a stock from consideration
+        function removeStock(ticker) {
+            removedStocks.add(ticker);
+            // Clear selection for this stock if it was selected
+            const stockIndex = availableStocks.findIndex(s => s.ticker === ticker);
+            if (stockIndex !== -1 && selectedStocks.has(stockIndex)) {
+                selectedStocks.delete(stockIndex);
+            }
+            displayAvailableStocks();
+            updateAvailableSummary();
+        }
+        
+        // Restore a removed stock
+        function restoreStock(ticker) {
+            removedStocks.delete(ticker);
+            displayAvailableStocks();
+            updateAvailableSummary();
+        }
+        
+        // Clear all removed stocks
+        function clearAllRemovedStocks() {
+            removedStocks.clear();
+            displayAvailableStocks();
+            updateAvailableSummary();
+            showStatus('All removed stocks have been restored', 'success');
+        }
+        
+        // Random selection of stocks
+        function randomSelection() {
+            // Clear all existing selections first
+            clearSelection();
+            
+            // Count SELL signals
+            let sellCount = 0;
+            for (let i = 1; i <= 100; i++) {
+                const actionCell = document.getElementById(`action-${i}`);
+                if (actionCell && actionCell.textContent === 'SELL') {
+                    sellCount++;
+                }
+            }
+            
+            if (sellCount === 0) {
+                showStatus('No SELL signals to replace. No stocks selected.', 'error');
+                return;
+            }
+            
+            // Filter out removed stocks from available stocks
+            const selectableStocks = availableStocks.filter(stock => !removedStocks.has(stock.ticker));
+            
+            if (selectableStocks.length === 0) {
+                showStatus('No available stocks to select from (all are removed or excluded).', 'error');
+                return;
+            }
+            
+            // Group selectable stocks by rank
+            const stocksByRank = {
+                99: selectableStocks.filter(s => parseInt(s['Current Rank']) === 99),
+                98: selectableStocks.filter(s => parseInt(s['Current Rank']) === 98),
+                97: selectableStocks.filter(s => parseInt(s['Current Rank']) === 97),
+                96: selectableStocks.filter(s => parseInt(s['Current Rank']) === 96),
+                95: selectableStocks.filter(s => parseInt(s['Current Rank']) === 95)
+            };
+            
+            // Select stocks with priority: 99 > 98 > 97 > 96 > 95
+            let toSelect = sellCount;
+            const ranks = [99, 98, 97, 96, 95];
+            
+            for (const rank of ranks) {
+                if (toSelect === 0) break;
+                
+                const stocksAtRank = [...stocksByRank[rank]]; // Create copy for shuffling
+                
+                // Shuffle the stocks at this rank
+                for (let i = stocksAtRank.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [stocksAtRank[i], stocksAtRank[j]] = [stocksAtRank[j], stocksAtRank[i]];
+                }
+                
+                // Select up to toSelect stocks from this rank
+                const selectFromRank = Math.min(toSelect, stocksAtRank.length);
+                for (let i = 0; i < selectFromRank; i++) {
+                    const stock = stocksAtRank[i];
+                    const index = availableStocks.findIndex(s => s.ticker === stock.ticker);
+                    selectedStocks.add(index);
+                }
+                
+                toSelect -= selectFromRank;
+            }
+            
+            // Refresh display to show selections
+            displayAvailableStocks();
+            updateAvailableSummary();
+            
+            if (toSelect > 0) {
+                showStatus(`${selectedStocks.size} stocks randomly selected (${toSelect} fewer than requested due to removed/unavailable stocks).`, 'success');
+            } else {
+                showStatus(`${selectedStocks.size} stocks randomly selected for purchase.`, 'success');
+            }
+        }
+        
+        // Clear selection
+        function clearSelection() {
+            selectedStocks.clear();
+            
+            // Refresh the display to remove selection highlights
+            displayAvailableStocks();
+            updateAvailableSummary();
+        }
+        
+        // Update available stocks summary
+        function updateAvailableSummary() {
+            const totalAvailable = availableStocks.length;
+            const removedCount = Array.from(removedStocks).filter(ticker => 
+                availableStocks.some(stock => stock.ticker === ticker)
+            ).length;
+            const effectiveAvailable = availableStocks.filter(stock => !removedStocks.has(stock.ticker)).length;
+            
+            document.getElementById('availableCount').textContent = effectiveAvailable;
+            document.getElementById('selectedCount').textContent = selectedStocks.size;
+            document.getElementById('removedCount').textContent = removedCount;
         }
         
         // Clear a row
@@ -506,12 +903,15 @@
         // Clear all tickers
         function clearAllTickers() {
             if (confirm('Are you sure you want to clear all tickers?')) {
+                window.isRefreshing = true;
                 portfolioTickers = new Array(100).fill('');
                 for (let i = 1; i <= 100; i++) {
                     document.getElementById(`ticker-${i}`).value = '';
                     clearRow(i);
                 }
+                window.isRefreshing = false;
                 updateSummary();
+                updateAvailableStocks();
                 showStatus('All tickers cleared', 'success');
             }
         }
@@ -526,7 +926,8 @@
                 const ticker = document.getElementById(`ticker-${i}`).value;
                 if (ticker) {
                     holdingCount++;
-                    const action = document.getElementById(`action-${i}`).textContent;
+                    const actionCell = document.getElementById(`action-${i}`);
+                    const action = actionCell ? actionCell.textContent : '';
                     if (action === 'SELL') sellCount++;
                     else if (action === 'HOLD') holdCount++;
                 }
@@ -539,11 +940,15 @@
         
         // Refresh all data
         function refreshData() {
+            window.isRefreshing = true;
             for (let i = 1; i <= 100; i++) {
                 if (document.getElementById(`ticker-${i}`).value) {
                     updateStockData(i);
                 }
             }
+            window.isRefreshing = false;
+            // Always update available stocks after refreshing
+            updateAvailableStocks();
         }
         
         // Import from Excel
@@ -593,7 +998,15 @@
                         let importedCount = 0;
                         for (let i = tickerStartRow; i < jsonData.length && importedCount < 100; i++) {
                             const row = jsonData[i];
-                            if (row[1]) { // Ticker is in column B (index 1)
+                            
+                            // Stop if we hit the "Selected for Purchase" section or empty rows
+                            if (!row[0] && !row[1]) break; // Empty row
+                            if (row[0] === '' && row[1] === 'Selected for Purchase') break;
+                            if (row[1] === 'Selected for Purchase') break;
+                            if (row[0] === 'Selected for Purchase') break;
+                            
+                            // Only import if there's a valid ticker in column B
+                            if (row[1] && row[1] !== 'Ticker' && row[1] !== 'TICKER') { // Skip header rows
                                 portfolioTickers[importedCount] = row[1].toString().toUpperCase();
                                 importedCount++;
                             }
@@ -602,6 +1015,7 @@
                     
                     // Refresh the display
                     initializePortfolio();
+                    updateAvailableStocks(); // Update available stocks after import
                     showStatus(`Portfolio imported successfully! ${portfolioTickers.filter(t => t).length} tickers loaded.`, 'success');
                     
                 } catch (error) {
@@ -659,6 +1073,56 @@
                 }
             }
             
+            // Add summary of actions for reference
+            const sellStocks = [];
+            for (let i = 1; i <= 100; i++) {
+                const ticker = document.getElementById(`ticker-${i}`).value;
+                if (ticker) {
+                    const action = document.getElementById(`action-${i}`).textContent;
+                    if (action === 'SELL') {
+                        sellStocks.push(ticker);
+                    }
+                }
+            }
+            
+            if (sellStocks.length > 0) {
+                portfolioData.push(['']);
+                portfolioData.push(['']);
+                portfolioData.push(['--- ACTION SUMMARY (REFERENCE ONLY) ---']);
+                portfolioData.push(['Stocks to SELL', sellStocks.join(', ')]);
+                portfolioData.push(['Number of SELL signals', sellStocks.length]);
+                if (selectedStocks.size > 0) {
+                    portfolioData.push(['Number of stocks selected for purchase', selectedStocks.size]);
+                }
+                portfolioData.push(['--- END ACTION SUMMARY ---']);
+            }
+            
+            // Add selected stocks section if any are selected
+            if (selectedStocks.size > 0) {
+                portfolioData.push(['']);
+                portfolioData.push(['']);
+                portfolioData.push(['--- REFERENCE ONLY - DO NOT IMPORT ---']);
+                portfolioData.push(['Selected for Purchase (from last week)']);
+                portfolioData.push(['#', 'Ticker', 'Name', 'Sector', 'Country', 'Mkt Cap', 'Current Rank']);
+                
+                let selectedIndex = 1;
+                selectedStocks.forEach(index => {
+                    const stock = availableStocks[index];
+                    if (stock) {
+                        portfolioData.push([
+                            selectedIndex++,
+                            stock.ticker,
+                            stock.Name || '-',
+                            stock.Sector || '-',
+                            stock['Country ISO Code'] || '-',
+                            formatMarketCap(stock['Mkt Cap (USD)']),
+                            stock['Current Rank'] || '-'
+                        ]);
+                    }
+                });
+                portfolioData.push(['--- END OF REFERENCE SECTION ---']);
+            }
+            
             // Combine all data
             const exportData = [...configData, ...portfolioData];
             
@@ -703,7 +1167,7 @@
             }, 5000);
         }
         
-        // Event listeners for position sizing guide (informational only)
+        // Event listeners for position sizing guide
         document.getElementById('portfolioSize').addEventListener('change', updateComputedValues);
         document.getElementById('portfolioValue').addEventListener('change', updateComputedValues);
         document.getElementById('minimumRank').addEventListener('change', refreshData);
